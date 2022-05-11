@@ -14,7 +14,7 @@ if($_POST)
 	
 	if ($startCount>0)
 	{
-		alertError("start error"); 
+		alertError("This Start time is invalid"); 
 	}
 	else
 	{

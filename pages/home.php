@@ -1,7 +1,14 @@
 <?php session_start();
 if(empty($_SESSION['id'])):
 header('Location:../index.php');
-endif;?>
+endif;
+$activeSemester = '';
+	include('../dist/includes/dbcon.php');
+	$semesterQuery=mysqli_query($con,"select * from settings where status='active'")or die(mysqli_error($con));
+	while($row=mysqli_fetch_array($semesterQuery)){
+		$activeSemester = $row['sem'];
+	}
+?>
 
 <!DOCTYPE html>
 <html>
@@ -214,7 +221,7 @@ endif;?>
 							<label for="date">Subject</label><br>
 									<select class="form-control select2" name="subject" required id="subject_select">
 										 <?php 
-									$query2=mysqli_query($con,"select * from subject")or die(mysqli_error($con));
+									$query2=mysqli_query($con,"select * from subject where sem = '$activeSemester'")or die(mysqli_error($con));
 									  while($row=mysqli_fetch_array($query2)){
 								  ?>
 										<option><?php echo $row['subject_title'];?></option>
@@ -230,15 +237,8 @@ endif;?>
 									
 									<div class="form-group2">
 							<label for="date">Semester</label><br>
-									
-										 <?php 
-									$query2=mysqli_query($con,"select * from settings where status='active'")or die(mysqli_error($con));
-									  while($row=mysqli_fetch_array($query2)){
-								  ?>
-									<input type="text" name="sem" value="<?php echo $row['sem'];?>" readonly>
-								  <?php }
-									
-								  ?>
+								
+							<input type="text" name="sem" id="input_active_semester" value="<?php echo $activeSemester;?>" readonly>
 							
 							  </div><!-- /.form group -->
 									</div>
@@ -561,7 +561,8 @@ $(".uncheck").click(function () {
 		var year = $('#year_select option:selected').text();
 		$.post("getSubject.php", 
 		{ 
-		'idcategory' : year 
+		'idcategory' : year,
+		 'input_active_semester' : $("#input_active_semester").val()
 		},
 			
 		function(data) {
